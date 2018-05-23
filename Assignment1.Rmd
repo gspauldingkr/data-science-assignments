@@ -6,16 +6,25 @@ output: html_document
 
 <h1>Professional Background</h1>
 <h2>Education:</h2>
-<ul><li>Bachelors in Management Information Systems at Florida International University</li></ul>s
+<ul>
+<li>Bachelors in Management Information Systems at Florida International University</li>
+</ul>
 <h2>Profession:</h2>
-Information Technology Specialist at Kaufman Rossin & Co
+<ul>
+<li>Information Technology Specialist at Kaufman Rossin & Co</li>
+</ul>
 <h2>Interets:</h2>
-Fishing, Video Games, Problem Solving
+<ul>
+<li>Outdoors Activities, Television, Problem Solving</li>
+</ul>
 <h2>Skills:</h2>
-Network Administration (Windows Server)
-.NET Development (C#, ASP.NET)
-Database Administration (SQL Server, T-SQL)
-Web Development (HTML, CSS, Javascript)
+<ul>
+<li>Network Administration (Windows Server)</li>
+<li>.NET Development (C#, ASP.NET)</li>
+<li>Database Administration (SQL Server, T-SQL)</li>
+<li>Web Development (HTML, CSS, Javascript)</li>
+</ul>
 ```{r}
 #I'm learning data science!
 ```
+<img src="gregory.jpg">
