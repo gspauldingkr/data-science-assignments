@@ -3,3 +3,5 @@ title: "Assignment 1"
 author: 'Gregory Spaulding'
 output: html_document
 ---
+
+<h1>Professional Background</h1>
