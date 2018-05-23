@@ -5,3 +5,8 @@ output: html_document
 ---
 
 <h1>Professional Background</h1>
+<h2>Education:</h2>
+Bachelors in Management Information Systems at Florida International University
+<h2>Profession:</h2>
+Information Technology Specialist at Kaufman Rossin & Co
+<h2>Interets:</h2>
