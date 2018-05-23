@@ -27,4 +27,5 @@ output: html_document
 ```{r}
 #I'm learning data science!
 ```
+<br />
 <img src="gregory.jpg">
