@@ -1,25 +1,25 @@
 ---
 title: "R Basics"
-author: "Your name!"
+author: "Gregory Spaulding"
 output: html_notebook
 ---
 
 ## Practice
 Tweak each of the following R commands so that they run correctly:
 ```{r eval=FALSE}
-library(Tidyverse)
+library(tidyverse)
 ```
 
 ```{r}
 ggplot(data = iris) + 
-  geom_point(maping = aes(x = Sepal.Length, y = Sepal.Width))
+  geom_point(mapping = aes(x = Sepal.Length, y = Sepal.Width))
 ```
 
 ```{r}
-arronge(mtcars, mpg)
+arrange(mtcars, mpg)
 ```
 
 ```{r}
 data(diamonds)
-filter(diamond, carrat > 3)
+filter(diamonds, carat > 3)
 ```
