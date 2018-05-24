@@ -9,13 +9,13 @@ output: html_document
 <ul>
 <li>Bachelors in Management Information Systems at Florida International University</li>
 </ul>
-<h2>Profession:</h2>
+<h2>Professional Background:</h2>
 <ul>
 <li>Information Technology Specialist at Kaufman Rossin & Co</li>
 </ul>
-<h2>Interets:</h2>
+<h2>Interests:</h2>
 <ul>
-<li>Outdoors Activities, Television, Problem Solving</li>
+<li>Outdoors Activities, Science Fiction, Problem Solving</li>
 </ul>
 <h2>Skills:</h2>
 <ul>
