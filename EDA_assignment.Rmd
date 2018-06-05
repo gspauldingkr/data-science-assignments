@@ -66,4 +66,9 @@ cor(swiss)
 
 >Explain these correlations is simple terms based on what you know that the variables represent.
 
+Education and examination share a very strong correlation.
 
+```{r}
+swiss %>% cor() %>%
+  corrplot(method = "circle")
+```
