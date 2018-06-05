@@ -20,13 +20,14 @@ We went through some exploratory analysis on our own, which will help us answer 
 
 Load mlbench and tidyverse
 ```{r}
-#code to load
+library(mlbench)
+library(tidyverse)
 ```
 The package `mlbench` has a bunch of datasets that you can use to explore and build machine learning models on. 
 
 Select the dataset you'll work with and load it using `data()`
 ```{r}
-#code to load dataset
+data(swiss)
 ```
 
 > Since we aren't familiar with the variables in this data, we should probably keep the explanation of these variables handy
@@ -35,28 +36,34 @@ Select the dataset you'll work with and load it using `data()`
 1. **Take a glimpse of your data.**
 ```{r}
 #view the first 6 rows
+head(swiss,6)
 
 ```
 2. **Look at the dimensions of your data.**
 ```{r}
 #dimensions
+dim(swiss)
 ```   
     
 3. **Look at the class types of each variable in your data.**
 ```{r}
 #class types
+class(swiss)
 ```
 4. **Distribution of your data**
 ```{r}
 #distributions
+summary(swiss)
 ```
 
 5. **Correlations in your data**
 
 ```{r}
 #try the pairs() function or the cor() function from the corrplot package.  
+cor(swiss)
 
 ```
 
 >Explain these correlations is simple terms based on what you know that the variables represent.
+
 

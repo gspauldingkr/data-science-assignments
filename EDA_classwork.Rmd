@@ -1,0 +1,85 @@
+```{r}
+library(mlbench)
+library(tidyverse)
+library(Hmisc)
+data("BostonHousing2")
+```
+
+```{r}
+head(BostonHousing2)
+```
+
+```{r}
+tail(BostonHousing2)
+```
+
+```{r}
+dim(BostonHousing2)
+```
+
+```{r}
+ncol(BostonHousing2)
+```
+
+```{r}
+nrow(BostonHousing2)
+```
+
+```{r}
+str(BostonHousing2)
+```
+
+```{r}
+class(BostonHousing2)
+```
+
+```{r}
+sapply(BostonHousing2, class)
+```
+
+```{r}
+summary(BostonHousing2)
+```
+
+```{r}
+describe(BostonHousing2)
+```
+
+```{r}
+hist(BostonHousing2$cmedv)
+```
+
+```{r}
+hist(BostonHousing2$cmedv, 20)
+```
+
+```{r}
+hist(BostonHousing2$cmedv, 50)
+```
+
+```{r}
+boxplot(BostonHousing2$cmedv)
+```
+
+```{r}
+bh_explore <- subset.data.frame(BostonHousing2, select = c(crim, zn, indus, rm, age, dis, ptratio, b, cmedv))
+
+pairs(bh_explore)
+```
+
+```{r}
+library(corrplot)
+```
+
+```{r}
+bh_explore %>% cor() %>%
+  corrplot(method = "circle")
+```
+```{r}
+plot(x=BostonHousing2$cmedv, y = BostonHousing2$rm)
+```
+
+```{r}
+
+```
+
