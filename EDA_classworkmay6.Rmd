@@ -66,6 +66,94 @@ write_xlsx(mtcars, path="cars.xlsx")
 
 
 ```{r}
+service_data<-read_csv("311_Service_Requests_-_Miami-Dade_County.csv")
+```
+
+
+```{r}
+library(janitor)
+colnames(service_data)
+```
+
+```{r}
+service_data<-clean_names(service_data)
+colnames(service_data)
+```
+
+
+```{r}
+#How many rows and columns are in this data?
+nrow(service_data)
+ncol(service_data)
+```
+
+
+```{r}
+#How many cities are represented in the data
+nrow(unique(as.data.frame(service_data$city)))
+```
+
+
+```{r}
+#What is the most frequently occuring issue type? Hint: Use the table function.
+#as.data.frame(table(service_data$issue_type))
+summary(as.data.frame(service_data$issue_type))
+```
+
+
+```{r}
+#Create a dataframe with the frequencies of each Ticket Status and their percentage from the whole. What percentage of tickets have a status of ‘CLOSED’? Name the columns and save the output as a csv titled ticket_status.csv
+#issue_type<-as.data.frame(table(service_data$issue_type))
+ticket_status<-as.data.frame((table(service_data$ticket_status)))
+```
+
+
+```{r}
+tickets<-sum(ticket_status$Freq)
+ticket_status<-as.data.frame(cbind(ticket_status, (ticket_status$Freq/tickets)*100))
+colnames(ticket_status)<-c("Ticket_Status", "Frequency", "Percentage")
+```
+
+
+```{r}
+write_csv(ticket_status, "ticket_status.csv")
+```
+
+
+
+```{r}
+#You are the new manager on the 311 analysis team. You want your employees to look into tickets that were created over 30 days ago and are still open to #ensure that they are being correctly classified and haven’t fallen through the cracks. You are going to create a new file with only the “overdue open #tickets” so that they can be evaluated. Follow the steps below to create this new file.
+
+#You’re going to leave your work documented in an R Notebook so that you can share it with your team and they can build on it as needed.
+
+#Make sure your variables related to Dates are Date data types. If they aren’t, convert them to dates with the format month/day/year.
+
+#Create a new variable, open_30, with only tickets that are OPEN and were created more than 30 days 
+format(Sys.Date()-30, "%m/%d/%y")
+as.POSIXct(Sys.Date()-30)
+open_30<-as.data.frame(subset(service_data, ticket_status=="OPEN" & as.Date(ticket_created_date_time, "%m/%d/%Y %H:%M:%S")<(Sys.Date()-30)))
+```
+
+
+```{r}
+#How many rows do you have in your new open_30 variable?
+nrow(open_30)
+```
+
+
+```{r}
+#We actually have a different number of days as a goal depending on the type of issue, and you decide that even though some tickets have been open for #more than 30 days, if the goal is greater than 30 days, you won’t worry about those yet. Create a new variable as part of your dataset for the number of #days the ticket has been open.
+
+#Create a new variable overdue and only keep the issues that are greater than 30 days and are over the goal days.
+overdue<- subset(open_30, (as.Date(ticket_created_date_time, "%m/%d/%Y %H:%M:%S")+goal_days)<(Sys.Date()-30))
 
 ```
+
+
+```{r}
+#Write the overdue dataset to a new csv called Overdue_Tickets.csv
+write_csv(overdue, "Overdue_Tickets.csv")
+```
+
+
 
