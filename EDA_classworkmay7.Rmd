@@ -1,0 +1,220 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+More and more, companies have data stored in Googlesheets. Maybe they are the results of a google survey or maybe it’s some google analytics data. The package googlesheets allows you to import data from googlesheets to R and also to manage data that is stored in a Googlesheet directly from R! The googlesheets package is actually a wrapper for the API, which makes it pretty easy/ straightforward.
+
+```{r}
+library(googlesheets)
+library(tidyverse)
+```
+
+```{r}
+gs_gap() %>% 
+  gs_copy(to = "Gapminder")
+```
+
+
+```{r}
+gap <- gs_title("Gapminder", verbose = FALSE)
+```
+
+
+```{r}
+gap
+```
+
+
+```{r}
+gs_ls()
+```
+
+
+```{r}
+gap %>% gs_browse()
+```
+
+
+```{r}
+africa <- gs_read(gap, ws="Africa")
+```
+
+
+```{r}
+europe <- gs_read(gap, ws="Europe")
+```
+
+
+```{r}
+glimpse(africa)
+```
+
+
+```{r}
+glimpse(europe)
+```
+
+
+```{r}
+library(httr)
+genes <- GET(url= 'https://genelab-data.ndc.nasa.gov/genelab/data/search?term=space&from=0&type=cgene,nih_geo_gse&ffield=links&fvalue=GPL16417&ffield=Data%20Source%20Accession&fvalue=GSE82255&api_key=DWhP4gQqRT8DigPNex0eLM4zoXNcCLmLH8883UU31')
+names(genes)
+```
+
+
+```{r}
+genes_parsed <- content(genes, as='parsed', type = "application/json")
+sapply(genes_parsed, class)
+```
+
+
+```{r}
+sapply(genes_parsed$hits, class)
+```
+
+
+```{r}
+library(jsonlite)
+```
+
+
+```{r}
+genes_fromJSON <-fromJSON('https://genelab-data.ndc.nasa.gov/genelab/data/search?term=space&from=0&type=cgene,nih_geo_gse&ffield=links&fvalue=GPL16417&ffield=Data%20Source%20Accession&fvalue=GSE82255&api_key=DEMO_KEY')
+sapply(genes_fromJSON, class)
+```
+
+
+```{r}
+sapply(genes_fromJSON$hits, class)
+```
+
+
+```{r}
+#content()
+```
+
+
+```{r}
+metadata <- fromJSON("https://data.nasa.gov/data.json")
+```
+
+
+```{r}
+class(metadata)
+```
+
+
+```{r}
+sapply(metadata, class)
+```
+
+
+```{r}
+names(metadata)
+```
+
+
+```{r}
+names(metadata$dataset)
+```
+
+
+```{r}
+glimpse(metadata$dataset)
+```
+
+
+```{r}
+nasa_flat <- jsonlite::flatten(metadata$dataset)
+class(nasa_flat)
+```
+
+
+```{r}
+dim(nasa_flat)
+```
+
+
+```{r}
+colnames(nasa_flat)
+```
+
+
+```{r}
+class(nasa_flat)
+```
+
+
+```{r}
+class(nasa_flat$keyword)
+```
+
+
+```{r}
+nasa_keyword <- nasa_flat %>% 
+  select(keyword, `_id.$oid`) %>% 
+  unnest()
+
+str(nasa_keyword)
+```
+
+
+```{r}
+nasa_keyword %>% 
+  group_by(keyword) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+```
+
+
+```{r}
+library(rvest)
+```
+
+
+```{r}
+url <- "https://www.amazon.com/Echo-2nd-Generation-speaker-Charcoal/product-reviews/B06XCM9LJ4/ref=cm_cr_arp_d_viewopt_sr?ie=UTF8&reviewerType=all_reviews&filterByStar=one_star&pageNumber=1" #URL for 1-star reviews
+
+reviews <- read_html(url) 
+```
+
+
+```{r}
+css <- ".review-text" 
+nodes <- html_nodes(reviews, css)
+text <- html_text(nodes)
+
+text
+```
+
+
+```{r}
+get_reviews <- function(url_base, i, css='.review-text'){
+  x = vector()
+  for (n in 1:i){
+    reviews <- read_html(paste(url_base, n, sep=""))
+    nodes <- html_nodes(reviews, css)
+    text <- html_text(nodes)
+    x <- c(x, text)
+  }
+  return(x)
+}
+```
+
+
+```{r}
+url_base <- "https://www.amazon.com/Echo-2nd-Generation-speaker-Charcoal/product-reviews/B06XCM9LJ4/ref=cm_cr_arp_d_viewopt_sr?ie=UTF8&reviewerType=all_reviews&filterByStar=one_star&pageNumber="
+
+reviews <- get_reviews(url_base, 10)
+```
+
+
+```{r}
+#library(readr)
+reviews %>%
+  as.data.frame() %>% #converting to dataframe
+  write_csv('reviews.csv') #writing to csv
+```
+
+

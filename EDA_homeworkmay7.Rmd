@@ -1,0 +1,137 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+API Key: 571a4f1673acd5f3e9fcd1874bd2f5fb681d6506
+```{r}
+library(censusapi)
+```
+
+
+```{r}
+key = "571a4f1673acd5f3e9fcd1874bd2f5fb681d6506"
+Sys.setenv(CENSUS_KEY=key)
+```
+
+
+```{r}
+Sys.getenv("CENSUS_KEY")
+```
+
+
+```{r}
+apis<-listCensusApis()
+head(apis[,1:6])
+```
+
+
+```{r}
+x = c(2000, 2005, 2010, 2015)
+y = c(888, 950, 1100, 1375)
+plot(x,y, type = 'b', xlab = 'Year', ylab = 'Rent', pch = '$', lwd = 2, cex = 2, col='blue', main='The Rent is Too Damn High!')
+```
+
+
+```{r}
+ACSpop2009 <- getCensus(name = 'acs5', vintage = 2009,
+                    vars = c("NAME", 'B01003_001E'),
+                    region = 'county:*', regionin = 'state:12')
+```
+
+
+```{r}
+#Now you create the two additional data frames for 2012 and 2015.
+## your code here
+# ACSpop2012 <- getCensus()
+
+ACSpop2012 <- getCensus(name="acs5", vintage = 2012,
+                        vars = c("NAME", 'B01003_001E'),
+                        region = 'county:*', regionin = 'state:12')
+
+ACSpop2015 <- getCensus(name="acs5", vintage = 2015,
+                        vars = c("NAME", 'B01003_001E'),
+                        region = 'county:*', regionin = 'state:12')
+```
+
+
+
+```{r}
+ACSpopulationData<-cbind(ACSpop2009, ACSpop2012$B01003_001E, ACSpop2015$B01003_001E) #adding just the population column from second,third arg
+head(ACSpopulationData)
+```
+
+
+```{r}
+colnames(ACSpopulationData)<-c('state','county', 'county_name', 'population_2009', 'population_2012', 'population_2015')
+head(ACSpopulationData)
+```
+
+
+```{r}
+MDpop<-ACSpopulationData[ACSpopulationData$county=='086',4:6]
+MDpop<-as.numeric(MDpop)
+class(MDpop)
+```
+
+
+```{r}
+plot(x=seq(2009,2015,3), y=MDpop, type='l', lwd=2, col='red',
+     ylab='Population', xlab = 'Year', main = 'Miami-Dade Population Growth')
+```
+
+
+```{r}
+#Part 1: Which county has the largest relative increase (percent increase) in population from 2009 to 2015? Hint: create a new column!
+
+ACSpopulationData2<-ACSpopulationData
+
+ACSpopulationData2$growth_2009_2015<-(ACSpopulationData2$population_2015/ACSpopulationData2$population_2009)
+
+head(ACSpopulationData2)
+
+```
+
+
+```{r}
+#Part 2: Pick a variable, and repeat at the level of block or census tract for one county. Create a graph like the simple one above showing the change over time in your neighborhood of some variable you find interesting.
+#*Remember from the documentation, if you want block level data, you have to specify a tract!
+
+ACSpopt2010 <- getCensus(name="acs5", vintage = 2010,
+                        vars = c("NAME", 'B01003_001E'),
+                        region = 'tract:*', regionin = 'state:12 county:011')
+
+ACSpopt2013 <- getCensus(name="acs5", vintage = 2013,
+                        vars = c("NAME", 'B01003_001E'),
+                        region = 'tract:*', regionin = 'state:12 county:011')
+
+ACSpopt2015 <- getCensus(name="acs5", vintage = 2015,
+                        vars = c("NAME", 'B01003_001E'),
+                        region = 'tract:*', regionin = 'state:12 county:011')
+```
+
+
+
+```{r}
+ACSpoptData<-cbind(ACSpopt2010, ACSpopt2013$B01003_001E, ACSpopt2015$B01003_001E)
+head(ACSpoptData)
+
+colnames(ACSpoptData)<-c('State', 'County', 'Tract', 'Name', '2010_Pop', '2013_Pop', '2015_Pop')
+```
+
+
+```{r}
+MDpopt<-ACSpoptData[ACSpoptData$Tract=='060107',5:7]
+MDpopt<-as.numeric(MDpopt)
+
+```
+
+
+```{r}
+plot(x=c(2010,2013,2015), y=MDpopt, type='l', lwd=2, col='red',
+     ylab='Population', xlab = 'Year', main = 'Tract 601.17, Broward County, Florida Population')
+```
+
+
+
