@@ -216,6 +216,10 @@ dbDisconnect(conn)    #last line -- close connection
 
 
 ```{r}
-plot(teams2016hw$Pct, teams2016hw$Salary, xlab = 'Win Pct', ylab = 'Salary', pch = '$', col='blue', main='Does salary affect winning percentage?')
+plot(teams2016hw$Pct, teams2016hw$Salary/1000000, xlab = 'Win Pct', ylab = 'Salary (Millions)', main='Does salary correlate with winning percentage?')
+
+library(corrplot)
+
+corrplot(cor(teams2016hw[3:6]), method="circle")
 ```
 
