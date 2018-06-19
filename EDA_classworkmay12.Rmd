@@ -1,0 +1,110 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+var_name <- 'value'
+```
+
+
+
+```{r}
+#install.packages("tidyverse")
+```
+
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+data(diamonds)
+
+head(diamonds)
+```
+
+
+```{r}
+head(diamonds$carat)
+```
+
+
+```{r}
+fav_movies <- list(first='American Gangster', second='Les Miserables', third='Forrest Gump')
+fav_movies$second
+```
+
+
+```{r}
+fav_movies$fourth <- 'Pulp Fiction'
+
+fav_movies
+```
+
+
+```{r}
+seq(1,10,2)
+```
+
+
+```{r}
+xtest <- head(diamonds)
+
+xtest
+
+#lapply()
+```
+
+
+```{r}
+require(tidyverse)
+data(diamonds)
+colnames(diamonds)
+```
+
+
+
+```{r}
+diamonds[c(1:10), c(1:4)] 
+
+```
+
+
+```{r}
+diamonds[1:10, 1:4]
+```
+
+
+```{r}
+diamonds[diamonds$carat == 2,]
+```
+
+
+```{r}
+diamonds[diamonds$carat == 2, c('carat', 'price')]
+```
+
+
+```{r}
+subset(diamonds, carat == 2)
+```
+
+
+
+```{r}
+subset(diamonds, carat == 2, select = c('carat', 'price'))
+```
+
+
+```{r}
+xtest
+
+
+xtest %>% summarise(table() = n()) %>% arrange(desc(table))
+
+arrange(xtest,)
+```
+

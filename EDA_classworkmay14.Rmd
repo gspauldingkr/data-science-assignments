@@ -1,0 +1,221 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r}
+#install.packages("RMariaDB")  
+#install.packages("DBI")
+```
+
+
+```{r}
+library(DBI) # R database interface
+library(RMariaDB)
+```
+
+
+```{r}
+getSqlConnection <- function(){
+  con <-
+    dbConnect(
+      RMariaDB::MariaDB(), 
+      username = 'root',
+      password = rstudioapi::askForPassword("Database password"), #'CupCknks9sKHy5gw'
+      host = '35.227.75.30',
+      dbname = 'lahman2016'
+    ) 
+  return(con)
+}
+```
+
+
+```{r}
+conn <- getSqlConnection()
+tables <- dbListTables(conn)
+print(tables)
+```
+
+
+```{r}
+dbDisconnect(conn)
+```
+
+
+```{r}
+conn <- getSqlConnection()
+batting<-dbGetQuery(conn, "select * from Batting")
+salary<-dbGetQuery(conn, "select * from Salaries")
+players<-dbGetQuery(conn, "select * from Master")
+dbDisconnect(conn)
+```
+
+
+```{r}
+head(players)
+```
+
+
+```{r}
+dim(batting)
+dim(salary)
+dim(players)
+```
+
+
+```{r}
+#1. Forumulate the query
+q0<- 'SELECT *
+      FROM Salaries
+      LIMIT 5'
+```
+
+
+```{r}
+#2.Open connection with getSqlConnection()
+conn <- getSqlConnection()
+#3. Send the query
+req<- dbSendQuery(conn, q0)
+#4. Fetch the result and print it out
+print(dbFetch(req))
+#5.Clear the query with
+dbClearResult(req)
+#6. Close the connection with dbDisconnect()
+dbDisconnect(conn)
+```
+
+
+```{r}
+#Question 1 - How many players ave salary information listed for the year 2016??
+q1<- 'SELECT COUNT(DISTINCT(playerID)) AS num_2016_players 
+      FROM Salaries 
+      WHERE yearid = 2016'
+```
+
+
+```{r}
+conn <- getSqlConnection() #line 1 -- open connection
+req<- dbSendQuery(conn, q1)
+print(dbFetch(req))
+dbClearResult(req) 
+dbDisconnect(conn)    #last line -- close connection
+```
+
+
+
+```{r}
+#Question 2 - For 2016, who was the highest paid player in the league HINT: Two parter - first consult the salary table
+
+q2 <-'SELECT playerID, salary 
+      FROM Salaries
+      WHERE yearid=2016
+      ORDER BY salary DESC
+      LIMIT 10'
+
+conn <- getSqlConnection() #line 1 -- open connection
+req<- dbSendQuery(conn, q2) #update with q3 for second query########
+print(dbFetch(req))
+dbClearResult(req) 
+dbDisconnect(conn)    #last line -- close connection
+
+```
+
+
+
+```{r}
+
+q3 <-"SELECT playerID, nameFirst, nameLast
+      FROM Master
+      WHERE playerID = 'kershcl01'" #strings have to go in quotes
+
+conn <- getSqlConnection() #line 1 -- open connection
+req<- dbSendQuery(conn, q3) #update with q3 for second query########
+print(dbFetch(req))
+dbClearResult(req) 
+dbDisconnect(conn)    #last line -- close connection
+```
+
+
+```{r}
+q4 <- "SELECT m.nameFirst, m.nameLast, s.salary
+      FROM Master AS m
+      INNER JOIN Salaries AS s
+      ON s.playerID = m.playerID
+      LIMIT 10"
+
+conn <- getSqlConnection() #line 1 -- open connection
+req<- dbSendQuery(conn, q4)
+print(dbFetch(req))
+dbClearResult(req) 
+dbDisconnect(conn)    #last line -- close connection
+```
+
+
+```{r}
+q4 <- "SELECT m.nameFirst, m.nameLast, SUM(s.salary)
+      FROM Master AS m
+      INNER JOIN Salaries AS s
+      ON s.playerID = m.playerID
+      WHERE s.salary>'5000000' AND s.yearid='2016'
+      GROUP BY m.nameFirst, m.nameLast"
+
+conn <- getSqlConnection() #line 1 -- open connection
+req<- dbSendQuery(conn, q4)
+print(dbFetch(req))
+dbClearResult(req) 
+dbDisconnect(conn)    #last line -- close connection
+```
+
+
+```{r}
+q5 <- 'SELECT *
+       FROM Teams
+       ORDER BY L desc
+       LIMIT 1'
+
+conn <- getSqlConnection() #line 1 -- open connection
+req<- dbSendQuery(conn, q5)
+print(dbFetch(req))
+dbClearResult(req) 
+dbDisconnect(conn)    #last line -- close connection
+```
+
+
+
+```{r}
+q6<- "SELECT DISTINCT sp.playerID, sp.nameFirst, sp.nameLast, sp.salary, sp.teamID, t.name
+      FROM (SELECT s.playerID, m.nameFirst, m.nameLast, s.salary, s.teamID
+      FROM Master AS m
+      INNER JOIN Salaries as s ON m.playerID = s.playerID
+      WHERE s.yearID=2016) as sp
+      INNER JOIN Teams as t ON sp.teamID = t.teamID
+      ORDER BY t.name"
+
+conn <- getSqlConnection() #line 1 -- open connection
+teams2016 <- dbGetQuery(conn, q6)
+dbDisconnect(conn)    #last line -- close connection
+```
+
+
+```{r}
+
+q7<- "SELECT t.teamID, t.name, SUM(t.W) as Wins, SUM(t.L) As Loss, SUM(t.W)/(SUM(t.W)+SUM(t.L)) As Pct, SUM(sp.salary) as Salary
+      FROM Teams as t
+      INNER JOIN (SELECT teamID, SUM(salary) as salary FROM Salaries WHERE yearID=2016 GROUP BY teamID) sp ON sp.teamID = t.teamID
+      WHERE t.yearID=2016
+      GROUP BY t.teamID, t.name
+      ORDER BY t.name"
+
+conn <- getSqlConnection() #line 1 -- open connection
+teams2016hw <- dbGetQuery(conn, q7)
+dbDisconnect(conn)    #last line -- close connection
+```
+
+
+
+```{r}
+plot(teams2016hw$Pct, teams2016hw$Salary, xlab = 'Win Pct', ylab = 'Salary', pch = '$', col='blue', main='Does salary affect winning percentage?')
+```
+

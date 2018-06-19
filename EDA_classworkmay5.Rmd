@@ -91,6 +91,8 @@ ncol(service_data)
 ```{r}
 #How many cities are represented in the data
 nrow(unique(as.data.frame(service_data$city)))
+#length(unique(service_data$city))
+#did not remove NAs
 ```
 
 
@@ -98,6 +100,7 @@ nrow(unique(as.data.frame(service_data$city)))
 #What is the most frequently occuring issue type? Hint: Use the table function.
 #as.data.frame(table(service_data$issue_type))
 summary(as.data.frame(service_data$issue_type))
+class(as.data.frame(service_data$issue_type))
 ```
 
 
@@ -105,6 +108,7 @@ summary(as.data.frame(service_data$issue_type))
 #Create a dataframe with the frequencies of each Ticket Status and their percentage from the whole. What percentage of tickets have a status of ‘CLOSED’? Name the columns and save the output as a csv titled ticket_status.csv
 #issue_type<-as.data.frame(table(service_data$issue_type))
 ticket_status<-as.data.frame((table(service_data$ticket_status)))
+#ticket_status<-table(service_data$ticket_status)%>% as.data.frame()
 ```
 
 
@@ -129,9 +133,11 @@ write_csv(ticket_status, "ticket_status.csv")
 #Make sure your variables related to Dates are Date data types. If they aren’t, convert them to dates with the format month/day/year.
 
 #Create a new variable, open_30, with only tickets that are OPEN and were created more than 30 days 
-format(Sys.Date()-30, "%m/%d/%y")
-as.POSIXct(Sys.Date()-30)
+#format(Sys.Date()-30, "%m/%d/%y")
+#as.POSIXct(Sys.Date()-30)
 open_30<-as.data.frame(subset(service_data, ticket_status=="OPEN" & as.Date(ticket_created_date_time, "%m/%d/%Y %H:%M:%S")<(Sys.Date()-30)))
+#open_30 <- service_data[service_data$ticket_status=='OPEN' & as.Date(service_data$ticket_created_date_time, "%m/%d/%Y %H:%M:%S")<(Sys.Date()-30), ]
+#head(service_data[service_data$ticket_status=='OPEN' & as.Date(service_data$ticket_created_date_time, "%m/%d/%Y %H:%M:%S")<(Sys.Date()-30), ])
 ```
 
 
