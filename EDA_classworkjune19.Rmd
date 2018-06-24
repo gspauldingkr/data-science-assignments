@@ -1,0 +1,235 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+
+
+```{r}
+library(readxl)
+library(tidyverse)
+```
+
+
+
+```{r}
+excel_sheets("Aid_received.xlsx")
+```
+
+
+```{r}
+excel_sheets("CountryMapping.xlsx")
+```
+
+
+
+```{r}
+aid <- read_excel("Aid_received.xlsx", sheet = "Data")
+country_map <- read_excel("CountryMapping.xlsx", sheet = "Countries_etc")
+```
+
+
+```{r}
+glimpse(aid)
+```
+
+
+```{r}
+#aid_tidy <-
+#  aid %>%
+#  gather(key = 'year', value = 'aid', -'ODA received, total (constant 2010 US$)',
+#         na.rm = TRUE)
+
+aid_tidy<-gather(aid, key = 'year', value = 'aid', -'ODA received, total (constant 2010 US$)',
+                 na.rm = TRUE)
+head(aid_tidy)
+```
+
+
+```{r}
+aid_clean<-
+  aid_tidy %>%
+  mutate(aid_in_mil = aid/1000000) %>%
+  rename(country = 'ODA received, total (constant 2010 US$)')
+
+head(aid_clean)
+```
+
+
+
+```{r}
+country_clean <- country_map %>%
+  select(name, 'Gapminder\'s 4 world regions':'Gapminder\'s 6 world regions')
+
+head(country_clean)
+
+```
+
+
+
+```{r}
+country_aid<- aid_clean %>%
+  inner_join(country_clean, by=c('country' = 'name'))
+
+head(country_aid)
+```
+
+
+```{r}
+tail(country_aid)
+```
+
+
+```{r}
+regions_4<-
+  country_aid %>%
+  group_by(`Gapminder's 4 world regions`)
+
+regions_6<-
+  country_aid %>%
+  group_by(`Gapminder's 6 world regions`)
+
+regions_8<-
+  country_aid %>%
+  group_by(`Gapminder's 8 subregions`)
+```
+
+
+```{r}
+country_aid %>%
+  filter(year==2010) %>%
+  arrange(aid_in_mil)
+```
+
+
+```{r}
+country_aid %>%
+  filter(year==2010) %>%
+  arrange(desc(aid_in_mil))
+```
+
+
+```{r}
+aid_2010 <- regions_8 %>%
+  filter(year==2010) %>%
+  summarise(y2010 = sum(aid_in_mil)) %>%
+  arrange(y2010)
+
+aid_2010
+
+```
+
+
+```{r}
+caid_2010<-country_aid %>%
+  group_by(`Gapminder's 8 subregions`, year) %>%
+  summarise(total_aid=sum(aid_in_mil)) %>%
+  arrange(desc(total_aid))
+
+caid_2010
+
+```
+
+
+
+```{r}
+aid_1960 <- regions_8 %>%
+  filter(year==1960) %>%
+  summarise(y1960 = sum(aid_in_mil)) %>%
+  arrange(y1960)
+
+aid_1960
+```
+
+
+```{r}
+aid_diff <- inner_join(aid_1960, aid_2010, 
+                       by= c("Gapminder's 8 subregions"=
+                               "Gapminder's 8 subregions")) %>%
+  mutate(diff = y2010 - y1960) %>%
+  arrange(diff)
+
+aid_diff
+```
+
+
+```{r}
+aid_diff <- inner_join(
+  
+  regions_8 %>%           ##start of table 1: aid_2010
+  filter(year == 2010) %>%
+  summarise(y2010 = sum(aid_in_mil)), 
+  
+  regions_8 %>%           ##start of table 2: aid_1960
+  filter(year == 1960) %>%
+  summarise(y1960 = sum(aid_in_mil)), 
+  
+  by= c("Gapminder's 8 subregions"=      ##join by
+          "Gapminder's 8 subregions")) %>%
+  
+  mutate(diff = y2010 - y1960) %>%       ##create new variable
+  arrange(diff) ##sort
+
+aid_diff
+```
+
+
+```{r}
+aid_diff <- aid_diff %>%
+  mutate(percent_diff = round(((y2010 - y1960)/y1960)*100, 2)) %>%
+  arrange(desc(percent_diff))
+
+aid_diff
+```
+
+
+```{r}
+north_america <- country_aid %>%
+  filter(`Gapminder's 8 subregions` == 'america_north' & year == c(1960,2010))
+
+north_america
+```
+
+
+```{r}
+?spread
+
+n_america_spread <- north_america %>%
+  select(country, year, aid_in_mil) %>%
+  spread(year, aid_in_mil)
+  
+n_america_spread
+```
+
+
+```{r}
+#Task 1
+sub_saharan_africa <- country_aid %>%
+  filter(`Gapminder's 8 subregions` == 'africa_sub_saharan' & year == c(1960,2010))
+
+sub_saharan_africa_spread <- sub_saharan_africa %>%
+  select(country, year, aid_in_mil) %>%
+  spread(year, aid_in_mil)
+
+sub_saharan_africa_spread
+```
+
+
+```{r}
+#Task 2
+africa_diff <- sub_saharan_africa_spread %>%
+  mutate(diff = `2010` - `1960`) %>%
+  arrange(desc(diff))
+
+africa_diff
+
+```
+
+
+```{r}
+#Task 3
+
+```
+

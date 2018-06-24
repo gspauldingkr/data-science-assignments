@@ -1,0 +1,268 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+my_name<-'gregory'
+str_length(my_name)
+```
+
+
+```{r}
+length(my_name)
+```
+
+
+```{r}
+str_c('hello', 'my', 'name', 'is', my_name)
+```
+
+
+```{r}
+str_c('hello', 'my', 'name', 'is', my_name, sep=" ")
+```
+
+
+```{r}
+str_sub(my_name, 1, 3)
+```
+
+
+```{r}
+str_sub(my_name, 1, 4)<-'Tandg'
+my_name
+```
+
+
+```{r}
+x<- c('apple', 'banana', 'cherry', 'mango', 'honeydew')
+str_length(x)
+length(x)
+str_sub(x,1,3)
+```
+
+
+```{r}
+pattern<-'a'
+```
+
+
+```{r}
+str_detect(x, pattern)
+```
+
+
+```{r}
+str_count(x, pattern)
+```
+
+
+```{r}
+str_locate(x, pattern)
+```
+
+```{r}
+str_subset(x, pattern)
+```
+
+
+```{r}
+str_locate(x, 'an')
+```
+
+
+```{r}
+str_locate_all(x, pattern)
+```
+
+
+```{r}
+str_extract(x, pattern)
+```
+
+
+```{r}
+str_extract_all(x,'an|ap')
+```
+
+```{r}
+?str_extract
+
+str_match(x, pattern)
+```
+
+
+```{r}
+strings <- c(" 219 733 8965", "329-293-8753 ", "banana", "595 794 7569",
+  "387 287 6718", "apple", "233.398.9187  ", "482 952 3315",
+  "239 923 8115 and 842 566 4692", "Work: 579-499-7527", "$1000",
+  "Home: 543.355.3679")
+phone <- "([2-9][0-9]{2})[- .]([0-9]{3})[- .]([0-9]{4})"
+
+str_extract(strings, phone)
+str_match(strings, phone)
+```
+
+
+```{r}
+
+library(readxl)
+countries <- read_excel("CountryMapping.xlsx", sheet = "Countries_etc")
+
+```
+
+
+
+```{r}
+head(countries)
+```
+
+
+```{r}
+country_names <- countries$name
+str(country_names)
+```
+
+
+```{r}
+str_subset(country_names, "'")
+```
+
+
+```{r}
+str_subset(country_names, 'al')
+```
+
+
+```{r}
+str_subset(country_names, 'al$')
+```
+
+
+```{r}
+str_subset(country_names, '^al')
+```
+
+
+```{r}
+str_subset(str_to_lower(country_names), '^al')
+```
+
+
+```{r}
+str_subset(str_to_lower(country_names), '^al') %>% str_to_title()
+```
+
+
+```{r}
+str_subset(country_names, "\\s" )
+```
+
+
+```{r}
+str_subset(country_names, "[\\.,]")
+```
+
+
+```{r}
+str_subset(country_names, "t+")
+```
+
+
+```{r}
+str_subset(country_names, "[Tt]")
+```
+
+
+```{r}
+str_subset(country_names, "t{2}")
+```
+
+
+```{r}
+country_names %>%
+  as_tibble() %>%
+  filter(!str_detect(value, "[Tt]"))
+```
+
+
+```{r}
+str_subset(country_names, "[Tt]+[a-zA-Z\\s]*[tT]+")
+```
+
+
+```{r}
+library(readr)
+library(dplyr)
+
+```
+
+
+```{r}
+numbers<-read_csv("phone_numbers.csv")
+```
+
+
+```{r}
+numbers
+```
+
+```{r}
+expression <- '^\\(?([0-9]{3})\\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$'
+```
+
+
+```{r}
+numbers %>% 
+  filter(str_detect(Number, expression))
+```
+
+
+```{r}
+text <- 'My phone number is 305.768.3456'
+
+text %>% str_extract(expression)
+```
+
+
+```{r}
+expression2 <- '\\(?([0-9]{3})\\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})'
+text %>% str_extract(expression2)
+```
+
+
+```{r}
+str_subset(country_names, "[y]$")
+
+```
+
+
+
+```{r}
+#[e[\\>]l
+str_subset(country_names, "s+s")
+
+```
+
+
+```{r}
+
+country_names %>%
+  as_tibble() %>%
+  filter(!str_detect(value, '[a]'))
+```
+
+
+```{r}
+
+```
+
