@@ -1,0 +1,272 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+
+
+```{r}
+library(tidyverse)
+#library(readr)
+housing <- read_csv("landdata-states.csv")
+```
+
+```{r}
+
+glimpse(housing)
+```
+
+
+```{r}
+help.search("geom_", package = "ggplot2")
+```
+
+
+```{r}
+hp2013Q1 <-housing %>% filter(Date == 2013.25)
+
+ggplot(hp2013Q1, aes(y=Structure.Cost, x=Land.Value))+ geom_point()
+```
+
+
+```{r}
+ggplot(hp2013Q1, aes(y=Home.Value, x=Land.Value))+geom_point()
+```
+
+
+```{r}
+plot(hp2013Q1$Land.Value, hp2013Q1$Home.Value)
+```
+
+
+```{r}
+base_plot <- ggplot(hp2013Q1, aes(y=Structure.Cost, x=Land.Value))
+```
+
+
+```{r}
+summary(base_plot)
+```
+
+
+```{r}
+base_plot
+```
+
+```{r}
+base_plot+geom_point()
+```
+
+
+```{r}
+home_value_plot <- ggplot(hp2013Q1, aes(y=Home.Value, x=Land.Value))+geom_point()
+```
+
+
+```{r}
+base_plot+geom_point()+geom_line()
+```
+
+
+```{r}
+base_plot + geom_point()+geom_smooth()
+```
+
+
+```{r}
+base_plot+geom_point()+geom_smooth(method='lm')
+```
+
+
+```{r}
+base_plot+geom_text(aes(label=State),size=3)
+```
+
+
+```{r}
+base_plot+geom_label(aes(label=State),size=3)
+```
+
+
+```{r}
+base_plot+geom_point(aes(size=2), color="red")
+```
+
+
+```{r}
+#base_plot+geom_label(aes(label=State),size=3)+geom_smooth()
+base_plot+geom_point(aes(size=Land.Price.Index, color=region))
+```
+
+
+```{r}
+base_plot<-base_plot+aes(color=Home.Value)
+base_plot+geom_point()
+```
+
+
+```{r}
+base_plot + geom_text(aes(label = State))
+```
+
+```{r}
+base_plot+geom_point(aes(shape=region))
+```
+
+
+```{r}
+home_plot<- ggplot(housing, aes(x=State, y=Home.Price.Index))+
+  geom_point(aes(color=Date),
+             alpha=0.3,
+             size=1.5,
+             position=position_jitter(width=0,height=0.25))
+```
+
+
+```{r}
+home_plot<- home_plot+
+  scale_x_discrete(name="State Abbreviation")+
+  scale_y_continuous(name="Home Price Index")
+
+home_plot
+```
+
+
+```{r}
+home_plot+scale_color_continuous(name="",
+                                 breaks=c(1976, 1994, 2013),
+                                 labels=c("'76", "'94", "'13"))
+```
+
+
+```{r}
+home_plot<-home_plot+scale_color_continuous(name="",
+                                            breaks=c(1976,1994,2013),
+                                            labels=c("'76", "'94", "'13"),
+                                            low = "orange",
+                                            high = "yellow")
+home_plot
+```
+
+
+```{r}
+home_plot +
+  scale_color_gradient2(name="",
+                         breaks = c(1976, 1994, 2013),
+                         labels = c("'76", "'94", "'13"),
+                        low = "blue",
+                        high = "red",
+                        mid = "gray60",
+                        midpoint = 1994)
+```
+
+
+```{r}
+home_plot +
+  geom_hline(aes(yintercept = 1), linetype = 3, size=5, color = "gray", position=position_jitter(width=0,height=0.25)) + 
+  scale_color_gradient2(name="",
+                         breaks = c(1976, 1994, 2013),
+                         labels = c("'76", "'94", "'13"),
+                        low = "blue",
+                        high = "red",
+                        mid = "gray60",
+                        midpoint = 1994)
+
+```
+
+
+```{r}
+state_plot <- ggplot(housing, aes(x = Date, y = Home.Value))
+
+state_plot <- state_plot + 
+  geom_line(aes(color = State))
+
+state_plot
+```
+
+
+```{r}
+ggplot(housing, aes(x = Date, y = Home.Price.Index)) + 
+  geom_hline(aes(yintercept = 1), linetype = 3, color = "black") + 
+  geom_point(alpha = 0.1) +
+  geom_line() + 
+  facet_wrap(~State)
+```
+
+
+```{r}
+data("msleep")
+```
+
+
+```{r}
+glimpse(msleep)
+```
+
+
+
+```{r}
+sleep_bodywt<-ggplot(msleep, aes(sleep_total, bodywt))
+
+sleep_bodywt+geom_point()
+```
+
+
+```{r}
+sleep_bodywt+geom_point()+geom_smooth()
+```
+
+
+```{r}
+#sleep_bodywt+geom_point()+geom_smooth()+ylim(0,2000)
+sleep_bodywt+geom_point()+geom_smooth()+coord_cartesian(xlim=c(0,5), ylim =c(0,500) )
+```
+
+
+```{r}
+sleep_bodywt +
+  geom_point() + ylim(0,2000) + aes(color = vore)
+```
+
+
+```{r}
+sleep_vore<-ggplot(msleep, aes(x=vore, y=sleep_total, color=vore) )+
+  geom_boxplot(aes(fill=vore))
+
+sleep_vore
+```
+
+
+```{r}
+med <- median(msleep$sleep_total)
+```
+
+
+```{r}
+sleep_vore + 
+  geom_hline(yintercept = med, linetype = 3, color = "blue", size=1) +
+  ggtitle("Sleep Total by Vore Type", "Animal Sleeping Patterns") +
+  xlab("Vore") +
+  ylab("Sleep Total")
+```
+
+
+```{r}
+library(RColorBrewer)
+display.brewer.all()
+```
+
+
+```{r}
+sleep_vore + 
+  geom_hline(yintercept = med, linetype = 3, color = "blue") +
+  ggtitle("Sleep Total by Vore Type", "Animal Sleeping Patterns") +
+  xlab("Vore") +
+  ylab("Sleep Total") +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+
+
