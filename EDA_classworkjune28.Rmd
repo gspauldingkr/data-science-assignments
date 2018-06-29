@@ -1,0 +1,175 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+library(readxl)
+library(lubridate)
+```
+
+
+```{r}
+aid <- read_excel("Aid_received.xlsx", sheet = "Data")
+mapping <- read_excel("CountryMapping.xlsx", sheet = "Countries_etc")
+
+aid_gathered <- aid %>%
+  gather(key = 'year', value = 'aid', -`ODA received, total (constant 2010 US$)`)
+
+country_aid <- inner_join(aid_gathered, 
+                          mapping, by = c('ODA received, total (constant 2010 US$)' = 'name'))
+```
+
+
+```{r}
+library(janitor)
+
+country_aid_clean <- clean_names(country_aid)
+  
+aid_all <- country_aid_clean %>%
+  rename(country = oda_received_total_constant_2010_us) 
+```
+
+
+```{r}
+aid_all$year <- str_c(aid_all$year, '01','01', sep = "-")
+aid_all$year <- ymd(aid_all$year)
+```
+
+
+```{r}
+glimpse(aid_all)
+```
+
+
+```{r}
+class_plot<-ggplot(aid_all, aes(y=aid, x=year))
+class_plot+geom_point()
+```
+
+
+```{r}
+class_plot+geom_point(aes(color=gapminders_4_world_regions), alpha=.5, size=1)
+```
+
+
+```{r}
+class_plot+
+  geom_point(aes(color=gapminders_4_world_regions), alpha=.5, size=1)+
+  coord_cartesian(ylim = c(0,10000000000))
+```
+
+
+```{r}
+class_plot+
+  geom_point(aes(color=gapminders_4_world_regions), alpha=.5, size=1)+
+  ylim(0,10000000000)
+```
+
+
+```{r}
+class_plot+
+  geom_point(aes(color=gapminders_4_world_regions), alpha=.5, size=1)+
+  facet_wrap(~gapminders_8_subregions)+
+  scale_color_discrete(name="World Bank Income Group 2017")
+```
+
+
+```{r}
+aid_2010 <- 
+  country_aid_clean %>%
+  filter(year == 2010)
+```
+
+
+```{r}
+class_hist<-ggplot(aid_2010, aes(aid))
+class_hist+geom_histogram()
+```
+
+
+```{r}
+class_hist2<-ggplot(aid_2010, aes(log(aid)))
+class_hist2+geom_histogram(binwidth=1)
+```
+
+
+```{r}
+class_hist+geom_histogram(aes(fill=gapminders_4_world_regions))
+```
+
+
+```{r}
+class_hist+geom_density(aes(color=gapminders_4_world_regions))
+```
+
+
+```{r}
+class_hist+
+  geom_col(aes(y=aid, x=gapminders_4_world_regions, fill=world_bank_income_group_2017),position = "stack")
+```
+
+
+
+```{r}
+library(RColorBrewer)
+```
+
+
+```{r}
+class_hist+geom_boxplot(aes(y=aid, x=gapminders_4_world_regions, fill=gapminders_4_world_regions))+
+  ggtitle("Aid 2010", " by Gapminder's 4 World Regions")+
+  xlab("Gapminder's 4 World Regions") +
+  ylab("Aid") +
+  scale_fill_brewer(palette="Dark2")
+```
+
+
+```{r}
+class_hist+geom_boxplot(aes(y=aid, x=gapminders_4_world_regions, fill=gapminders_4_world_regions))+
+  ggtitle("Aid 2010", " by Gapminder's 4 World Regions")+
+  xlab("Gapminder's 4 World Regions") +
+  ylab("Aid") +
+  scale_fill_brewer(palette="Dark2")+
+  geom_hline(yintercept=med, linetype=3)
+```
+
+
+```{r}
+top_variance <- aid_all %>%
+  group_by(country) %>%
+  mutate(variance = var(aid, na.rm = TRUE)) %>%
+  arrange(desc(variance)) %>%
+  distinct(country, variance) %>%
+  ungroup() %>%
+  slice(1:10)
+
+
+top_variance <- aid_all %>%
+  filter(country %in% top_variance$country)
+
+top_variance
+```
+
+
+```{r}
+ggplot(top_variance, aes(x=year, y=aid, color=country))+
+  geom_line()+
+  facet_wrap(~country)
+```
+
+
+```{r}
+
+```
+
+
+
+
+

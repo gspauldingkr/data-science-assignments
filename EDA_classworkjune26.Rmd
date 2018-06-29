@@ -269,4 +269,89 @@ sleep_vore +
 ```
 
 
+```{r}
+#install.packages("ggmap")
+library(ggmap)
+```
+
+
+```{r}
+#library(tidyverse)
+states<-read_csv("states.csv")
+```
+
+
+```{r}
+housing_latlong <- inner_join(housing, states, by = c('State' = 'Abbreviation'))
+```
+
+
+```{r}
+glimpse(housing_latlong)
+```
+
+
+```{r}
+rename(housing_latlong, state.name=State.y)
+```
+
+
+```{r}
+rename(housing_latlong, state.name = State.y)
+```
+
+
+```{r}
+usa_center = as.numeric(geocode("United States"))
+```
+
+
+```{r}
+usa_center
+```
+
+
+```{r}
+USAMap = ggmap(get_googlemap(center=usa_center, scale=2, zoom=4))
+```
+
+
+```{r}
+USAMap
+```
+
+
+```{r}
+usa_center2 = as.numeric(geocode("Sunrise,FL"))
+```
+
+
+```{r}
+USAMap2 = ggmap(get_googlemap(center=usa_center2, scale=2, zoom=18))
+USAMap2
+```
+
+
+```{r}
+homes2010 <- housing_latlong %>%
+  filter(Year == 2010)
+```
+
+
+```{r}
+USAMap + 
+   geom_point(aes(x=Longitude, y=Latitude, size = Home.Value, color=log(Home.Value)), data=homes2010, alpha=0.4) +
+  scale_size_continuous() +
+  ggtitle('Home Values in 2010', 'by state in the US')
+```
+
+
+
+
+
+
+
+
+
+
 
