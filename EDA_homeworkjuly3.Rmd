@@ -1,0 +1,44 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+#install.packages('ISLR')
+library(ISLR)
+
+help(package='ISLR')
+data('Carseats')
+
+Carseats <- Carseats %>% 
+  select(Sales, Income, Advertising, Age, Education)
+```
+
+```{r}
+carmodel1<-lm(Sales ~ ., data = Carseats)
+summary(carmodel1)
+```
+
+```{r}
+set.seed(123) # reproducibility!
+trainIndex2 <- createDataPartition(Carseats$Sales, p=.8, list=F)
+```
+
+```{r}
+carTrain <- Carseats[trainIndex2,]
+carTest <- Carseats[-trainIndex2,]
+```
+
+```{r}
+carmodel2<-lm(Sales~., data=carTrain)
+summary(carmodel2)
+```
+
+```{r}
+confint(carmodel1)
+```
+
+```{r}
+confint(carmodel2)
+```
+

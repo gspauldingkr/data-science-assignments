@@ -1,0 +1,145 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+
+```{r}
+library(tidyverse) # loads ggplot2 for us also
+library(caret) # primary machine learning library
+library(modelr) # easy syntax for goodness-of-fit evaluation
+library(broom) # tidy model outputs
+```
+
+```{r}
+advertising <- read_csv("http://www-bcf.usc.edu/~gareth/ISL/Advertising.csv") %>%
+  select(-X1)
+```
+
+```{r}
+summary(advertising)
+```
+
+```{r}
+set.seed(123) # reproducibility!
+trainIndex <- createDataPartition(advertising$sales, p=.8, list=F)
+# random <- sample(c(TRUE, FALSE), nrow(advertising), replace = F, prob = c(0.8,0.2))
+```
+
+```{r}
+adTrain <- advertising[trainIndex,]
+adTest <- advertising[-trainIndex,]
+```
+
+```{r}
+dim(adTrain)
+```
+
+```{r}
+dim(adTest)
+```
+
+```{r}
+model1 <- lm(sales ~ TV, data = adTrain)
+summary(model1)
+```
+
+```{r}
+model1$coefficients
+```
+
+```{r}
+tidy(model1)
+```
+
+```{r}
+confint(model1)
+```
+
+```{r}
+rsquare(model1, data = adTrain)
+```
+
+```{r}
+mean(abs(model1$residuals))
+```
+
+```{r}
+mae(model1, adTrain) # using modelr
+```
+
+```{r}
+sigma(model1)/mean(adTrain$sales)
+```
+
+```{r}
+ggplot(adTrain, aes(TV, sales))+
+  geom_point()+
+  geom_smooth(method = 'lm') 
+```
+
+```{r}
+testPredict <- predict(model1, adTest)
+head(testPredict)
+```
+
+```{r}
+testResid <- adTest$sales - testPredict # actual - predicted
+mean(abs(testResid))
+```
+
+```{r}
+model2 <- lm(sales ~ ., data = adTrain)
+# model2 <- lm(sales ~ TV + radio + newspaper, data = adTrain) #equivalent
+```
+
+```{r}
+summary(model2)
+```
+
+```{r}
+m2mae <- mae(model2, adTrain)
+m2mae
+```
+
+```{r}
+m2mae/(mean(adTrain$sales))
+```
+
+```{r}
+confint(model2)
+```
+
+```{r}
+mae(model2, adTest)
+```
+
+```{r}
+#model3 <-lm(sales ~ ., data=subset(adTrain, select=c("TV", "radio", "sales")))
+model3<-lm(sales~TV+radio, data=adTrain)
+summary(model3)
+```
+
+```{r}
+library(GGally)
+```
+
+```{r}
+ggpairs(adTrain)
+```
+
+```{r}
+adTrain <- adTrain %>%
+  add_predictions(model3)
+
+ggplot(adTrain, aes(x = pred, y = sales))+
+  geom_point() +
+  geom_smooth(method = 'lm')
+```
+
+```{r}
+
+```
+

@@ -166,10 +166,33 @@ ggplot(top_variance, aes(x=year, y=aid, color=country))+
 
 
 ```{r}
+aid_subset<-as.data.frame(subset(aid_all, select=c("country","year","aid"))) %>%
+  group_by(country, year) %>%
+  summarise_each(funs(sum))
 
+aid_subset<-aid_subset[!(is.na(aid_subset$aid)),]
+
+library(plotly)
+
+plot_ly(aid_subset, x = ~year, y = ~aid, type = "scatter",color = ~factor(country))
 ```
 
 
+```{r}
+dmddata<-diamonds
 
+head(dmddata)
+```
+
+```{r}
+dmddata_sub<-as.data.frame(subset(dmddata, select=c("carat","cut","color","clarity", "price"))) %>%
+  group_by(carat, cut, color, clarity) %>%
+  summarise_each(funs(mean))
+```
+
+
+```{r}
+dmddata_sub20+
+```
 
 
