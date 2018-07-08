@@ -1,0 +1,240 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+library(caret)
+library(broom)
+library(ISLR)
+options(scipen = 999)
+```
+
+```{r}
+data("Default")
+glimpse(Default)
+```
+
+```{r}
+plot<- ggplot(Default, aes(fill=default))
+
+plot+geom_bar(aes(student))
+```
+
+```{r}
+plot+geom_histogram(aes(income))
+```
+
+```{r}
+plot + geom_histogram(aes(balance))
+```
+
+```{r}
+table(Default$default)
+```
+
+```{r}
+ggplot(Default, aes(x = balance, y = income, color = student)) +
+  geom_point(alpha = .5) + 
+  facet_wrap(~default)
+```
+
+```{r}
+Default %>%
+  mutate(prob = ifelse(default == "Yes", 1, 0)) %>%
+  ggplot(aes(balance, prob)) +
+  geom_point(alpha = .15) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial")) +
+  ggtitle("Logistic regression model fit") +
+  xlab("Balance") +
+  ylab("Probability of Default") +
+  geom_hline(aes(yintercept = .5), linetype = 2) +
+  geom_hline(aes(yintercept = .4), linetype = 2, color = 'dark gray') +
+  geom_hline(aes(yintercept = .6), linetype = 2, color = 'dark gray') 
+```
+
+```{r}
+Default %>%
+  mutate(prob = ifelse(default == "Yes", 1, 0)) %>%
+  ggplot(aes(income, prob)) +
+  geom_point(alpha = .15) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial")) +
+  ggtitle("Logistic regression model fit") +
+  xlab("Income") +
+  ylab("Probability of Default") +
+  geom_hline(aes(yintercept = .5), linetype = 2) +
+  geom_hline(aes(yintercept = .4), linetype = 2, color = 'dark gray') +
+  geom_hline(aes(yintercept = .6), linetype = 2, color = 'dark gray') 
+```
+
+```{r}
+set.seed(123)
+trainIndex <- createDataPartition(Default$default, p=.7, list=F)
+# random <- sample(c(TRUE, FALSE), nrow(Default), replace = F, prob = c(0.7,0.3))
+```
+
+```{r}
+default_train <- Default[trainIndex,]
+head(default_train)
+```
+
+```{r}
+default_test <- Default[-trainIndex,]
+head(default_test)
+```
+
+```{r}
+dim(default_train)
+```
+
+```{r}
+dim(default_test)
+```
+
+```{r}
+logit_model1 <- glm(default ~ student + balance + income, family = "binomial", data = default_train) # building the model
+# glm(default ~ ., family = 'binomial', data = default_train) # equivalent
+
+summary(logit_model1) #look at details of model
+```
+
+```{r}
+logit_model2 <- glm(default ~ balance + student, family = "binomial", data = default_train)
+summary(logit_model2)
+```
+
+```{r}
+logit_model3 <- glm(default ~ balance + income, family = "binomial", data = default_train)
+summary(logit_model3)
+```
+
+```{r}
+logit_modelbase <- glm(default ~ income, family = "binomial", data = default_train)
+summary(logit_modelbase)
+```
+
+
+```{r}
+#head(Default %>% mutate(prob = ifelse(default == "Yes", 1, 0), prob2=ifelse(student=="Yes", 1, 0)))
+
+corrplot(cor(default_train %>% mutate(default1 = ifelse(default == "Yes", 1, 0), student1=ifelse(student=="Yes", 1, 0)) %>% subset(select=c("balance", "income", "default1", "student1"))), method=c("number"))
+```
+
+```{r}
+p_model1 <- predict(logit_model1, default_test, type = "response")
+head(p_model1)
+```
+
+```{r}
+default_test$p1 <- p_model1 # adding the column for new class probability
+head(default_test)
+```
+
+```{r}
+p_model2 <- predict(logit_model2, default_test, type = "response")
+
+default_test$p2 <- p_model2 # adding the column for new predictions
+```
+
+```{r}
+p_model3 <- predict(logit_model3, default_test, type = "response")
+
+default_test$p3 <- p_model3 # adding the column for new predictions
+```
+
+```{r}
+p_modelbase <- predict(logit_modelbase, default_test, type = "response")
+
+default_test$base <- p_modelbase # adding the column for new predictions
+```
+
+```{r}
+#Look at some positives:
+default_test %>%
+  filter(default=='Yes') %>%
+  select(p1,p2,p3,base) %>%
+  head(25)
+```
+
+```{r}
+# mostly negatives in our data, so unfiltered:
+head(default_test[,c(1,5:7)], 20)
+```
+
+```{r}
+#install.packages("ROCR")
+library(ROCR)
+```
+
+```{r}
+prediction(p_model1, default_test$default) %>%
+  performance(measure = "tpr", x.measure = "fpr") %>%
+  plot()
+```
+
+```{r}
+prediction(p_model2, default_test$default) %>%
+  performance(measure = "tpr", x.measure = "fpr") %>%
+  plot()
+```
+
+```{r}
+prediction(p_model3, default_test$default) %>%
+  performance(measure = "tpr", x.measure = "fpr") %>%
+  plot()
+```
+
+```{r}
+prediction(p_modelbase, default_test$default) %>%
+  performance(measure = "tpr", x.measure = "fpr") %>%
+  plot()
+```
+
+```{r}
+#install.packages("pROC")
+library(pROC)
+```
+
+```{r}
+roc_1 <- roc(default_test$default, p_model1)
+
+roc_2 <- roc(default_test$default, p_model2)
+
+roc_3 <- roc(default_test$default, p_model3)
+
+roc_base <- roc(default_test$default, p_modelbase)
+
+list(auc1 = auc(roc_1), auc2 = auc(roc_2), auc3= auc(roc_3), aucbase = auc(roc_base))
+```
+
+```{r}
+threshold <- .4 #setting the threshold
+
+default_test <- default_test %>% 
+  mutate(p1_class = as.factor(ifelse(p1 >= threshold, "Yes", "No")), p2_class = as.factor(ifelse(p2 >= threshold, "Yes", "No")), p3_class = as.factor(ifelse(p3 >= threshold, "Yes", "No")), pbase_class = as.factor(ifelse(base >= threshold, "Yes", "No")))
+```
+
+```{r}
+#library(caret)
+#install.packages("e1071")
+conf_mat1 <- confusionMatrix(default_test$p1_class, default_test$default, positive = 'Yes')
+
+conf_mat2 <- confusionMatrix(default_test$p2_class, default_test$default, positive = 'Yes')
+
+conf_mat3 <- confusionMatrix(default_test$p3_class, default_test$default, positive = 'Yes')
+
+conf_matbase <- confusionMatrix(default_test$pbase_class, default_test$default, positive = 'Yes')
+```
+
+```{r}
+list(conf_mat1, conf_mat2, conf_mat3, conf_matbase)
+```
+
+```{r}
+
+```
+

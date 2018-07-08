@@ -39,6 +39,20 @@ confint(carmodel1)
 ```
 
 ```{r}
-confint(carmodel2)
+confint(carmodel2) #training
+```
+
+```{r}
+ggplot(carTrain, aes(x = Advertising, y = Sales))+
+  geom_point() +
+  geom_smooth(method = 'lm')
+```
+
+```{r}
+corrplot(cor(Carseats), method = c("number"))
+```
+
+```{r}
+ggsave("sample.jpg")
 ```
 
